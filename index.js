@@ -1,10 +1,17 @@
-/* Enunciado: 
-- las cucas pueden moverse en las 4 direcciones ortogonales posibles (2D)
-- tienen direccion y posicion inicial.
-- avanzan de a una posicion siguiendo su posicion inicial
-- al chocar con una pared giran siempre hacia la izquierda
+/* 
+Enunciado
+
+- POV: prendes la luz en la cocina y esta lleno de cucas
+- las cucas pueden moverse hacia arriba, abajo, izquierda y derecha
+- tienen posicion y direccion inicial.
+- avanzan de a una posicion siguiendo su direccion inicial
+- si chocan con una pared o entre ellas, giran siempre hacia la izquierda
 - si pasan al lado de un agujero en la pared, se meten y se aumenta el contador de cucas en ese agujero.
+
+Tasks:
+
 - indicar donde terminaron las cucas
+- (extra): animar el escenario
 */
 import { Room } from "./classes.js";
 
