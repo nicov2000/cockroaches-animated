@@ -1,62 +1,30 @@
-/* 
-Enunciado
-
-- POV: prendes la luz en la cocina y esta lleno de cucas
-- las cucas pueden moverse hacia arriba, abajo, izquierda y derecha
-- tienen posicion y direccion inicial.
-- avanzan de a una posicion siguiendo su direccion inicial
-- si chocan con una pared o entre ellas, giran siempre hacia la izquierda
-- si pasan al lado de un agujero en la pared, se meten y se aumenta el contador de cucas en ese agujero.
-
-Tasks:
-
-- indicar donde terminaron las cucas
-- (extra): animar el escenario
-*/
 import { Room } from "./classes.js";
-
-// const kitchen = new Room([
-// 	"+----------------0---------------+", // 0
-// 	"|                                |", // 1
-// 	"|                                |", // 2
-// 	"|          U        D            |", // 3
-// 	"|     L                          |", // 4
-// 	"|              R                 |", // 5
-// 	"|           L                    |", // 6
-// 	"|  U                             1", // 7
-// 	"3        U    D                  |", // 8
-// 	"|         L              R       |", // 9
-// 	"|                                |", // 10
-// 	"+----------------2---------------+", // 11
-// 	//0										 				   33
-// ]);
+import { arrayOfZeros, delay } from "./functions.js";
 
 const kitchen = new Room([
-	"+----------------0------------------------+", // 0
-	"|                                         |", // 1
-	"|                                   D     |", // 2
-	"|          U        D                     |", // 3
-	"|     L                        L          |", // 4
-	"|              R             D            |", // 5
-	"|           L         D                   |", // 6
-	"|  U                           R    U     1", // 7
-	"3        U    D   D                       |", // 8
-	"|         L              R                |", // 9
-	"|                                         |", // 10
-	"|               U        U                |", // 10
-	"|                                R        |", // 10
-	"|                    D                    |", // 10
-	"|                                   D     |", // 10
-	"|         R                               |", // 10
-	"|     U                L     R            |", // 10
-	"|                                         |", // 10
-	"+----------------2------------------------+", // 11
-	//0										 				   33
+	"+----------------1------------------------+",
+	"|                                         |",
+	"|                                   D     |",
+	"|          U        D                     |",
+	"|     L                        L          |",
+	"|              R             D            |",
+	"|           L         D                   |",
+	"|  U                           R    U     2",
+	"4        U    D   D                       |",
+	"|         L              R                |",
+	"|                                         |",
+	"|               U        U                |",
+	"|                                R        |",
+	"|                    D                    |",
+	"|                                   D     |",
+	"|         R                               |",
+	"|     U                L     R            |",
+	"|                                         |",
+	"+----------------3------------------------+",
 ]);
 
-console.clear();
 // Web rendering
-let stateCont = 0;
+console.clear();
 
 const updateBtn = document.querySelector("#start-btn");
 updateBtn.addEventListener("click", start);
@@ -70,8 +38,57 @@ async function start() {
 
 	function newFrame() {
 		console.log(kitchen.roomLayout);
-		updateRoom();
-		updateMetrics();
+		updateWebScenario();
+		updateWebMetrics();
+	}
+
+	let stateCont = 0;
+	function updateWebScenario() {
+		const container = document.querySelector(".container");
+		const prevRoom = document.querySelector(".room-layout");
+
+		if (prevRoom) {
+			container.removeChild(prevRoom);
+		}
+
+		// ok
+		const roomContainer = document.createElement("div");
+		roomContainer.className = "room-layout";
+		roomContainer.id = `${stateCont}`;
+
+		kitchen.roomLayoutsHistory[stateCont].forEach((row) => {
+			const p = document.createElement("p");
+			p.className = "room-row";
+			p.innerText = row.replace(/\s/g, "*");
+			roomContainer.appendChild(p);
+		});
+
+		container.appendChild(roomContainer);
+		stateCont++;
+
+		kitchen.updateCockroachesPositions();
+	}
+
+	function updateWebMetrics() {
+		const metricsContainer = document.querySelector(".metrics");
+		const prevMetrics = document.querySelector("#results");
+
+		if (prevMetrics) {
+			metricsContainer.removeChild(prevMetrics);
+		}
+
+		const metrics = document.createElement("div");
+		metrics.id = "results";
+
+		const results = arrayOfZeros(kitchen.cockroaches.length);
+		kitchen.cockroaches.forEach((cockroach, index) => {
+			if (cockroach.inHole) {
+				results[index] = cockroach.inHole.id;
+			}
+		});
+
+		metrics.innerHTML = `<p>[${results}]</p>`;
+		metricsContainer.appendChild(metrics);
 	}
 
 	while (!allCockroachesInHoles) {
@@ -88,71 +105,7 @@ async function start() {
 
 	console.log(kitchen);
 }
-
-function updateRoom() {
-	const container = document.querySelector(".container");
-	const prevRoom = document.querySelector(".room-layout");
-
-	if (prevRoom) {
-		container.removeChild(prevRoom);
-	}
-
-	// ok
-	const roomContainer = document.createElement("div");
-	roomContainer.className = "room-layout";
-	roomContainer.id = `${stateCont}`;
-
-	kitchen.roomLayoutsHistory[stateCont].forEach((row) => {
-		const p = document.createElement("p");
-		p.className = "room-row";
-		p.innerText = row.replace(/\s/g, "*");
-		roomContainer.appendChild(p);
-	});
-
-	container.appendChild(roomContainer);
-	stateCont++;
-
-	kitchen.updateCockroachesPositions();
-}
-
-function updateMetrics() {
-	const metricsContainer = document.querySelector(".metrics");
-	const prevMetrics = document.querySelector("#results");
-
-	if (prevMetrics) {
-		metricsContainer.removeChild(prevMetrics);
-	}
-
-	const metrics = document.createElement("div");
-	metrics.id = "results";
-
-	const results = arrayOfZeros(kitchen.cockroaches.length);
-	kitchen.cockroaches.forEach((cockroach, index) => {
-		if (cockroach.inHole) {
-			results[index] = cockroach.inHole.id;
-		}
-	});
-
-	metrics.innerHTML = `<p>[${results}]</p>`;
-	metricsContainer.appendChild(metrics);
-}
-
 // end Web rendering
-
-function arrayOfZeros(length) {
-	let array = [];
-
-	for (let i = 0; i < length; i++) {
-		array.push(0);
-	}
-
-	return array;
-}
-
-// Delay (use as async code)
-function delay(time) {
-	return new Promise((resolve) => setTimeout(resolve, time));
-}
 
 // Bugs:
 // Si una cuca que va hacia abajo se encuentra con otra que va hacia arriba, se quedan quietas eternamente. Lo mismo pasa horizontalmente. Se resuelve dejando deshabilitado el checkeo de flag isNextTileOccupiedByAnotherCockroach(cockroach) en el metodo updateCockroachPosition de la clase Room.
