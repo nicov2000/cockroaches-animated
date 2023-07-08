@@ -1,5 +1,7 @@
 # Description
 
+An extension of a Leet code challenge. Its a generated scenario of dispersed cockroaches moving through the room, escaping into wallholes.
+
 ### Live link: https://nicov2000-cockroaches-everywhere.netlify.app/
 Restart: Just refresh page
 
